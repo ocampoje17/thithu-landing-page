@@ -3,23 +3,22 @@ import './App.css';
 
 interface VersionInfo {
   version: string;
-  notes: string;
   pub_date: string;
   download_url: string;
 }
 
+const VERSION_INFO_URL = "https://thithu.laychu.com";
+const DOWNLOAD_PAGE_URL = "https://laychu.com";
+
 function App() {
-  const defaultDriveUrl = "https://drive.google.com/drive/folders/19cGmYbVbUEyirDquXxKMCf7JEXLxP9WL?usp=sharing";
   const [versionInfo, setVersionInfo] = useState<VersionInfo>({
     version: "0.5.0",
-    notes: "Phiên bản v0.5.0 ổn định. Thêm tính năng làm bài thi trắc nghiệm, lưu lịch sử thi, hỗ trợ làm đề từ file .2td và giao diện tối chuyên nghiệp.",
     pub_date: "2026-05-24T10:30:00+07:00",
-    download_url: defaultDriveUrl
+    download_url: DOWNLOAD_PAGE_URL
   });
 
   useEffect(() => {
-    // Fetch latest version from version.json served locally in the public folder
-    fetch('/version.json')
+    fetch(VERSION_INFO_URL)
       .then(res => {
         if (!res.ok) throw new Error('Cannot fetch version info');
         return res.json();
@@ -27,7 +26,6 @@ function App() {
       .then((data: Partial<VersionInfo>) => {
         setVersionInfo(prev => ({
           version: data.version || prev.version,
-          notes: data.notes || prev.notes,
           pub_date: data.pub_date || prev.pub_date,
           download_url: data.download_url || prev.download_url
         }));
