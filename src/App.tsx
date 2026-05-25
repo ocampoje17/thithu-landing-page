@@ -7,7 +7,7 @@ interface VersionInfo {
   download_url: string;
 }
 
-const VERSION_INFO_URL = "https://thithu.laychu.com";
+const VERSION_INFO_URL = "https://thithu.laychu.com/version.json";
 const DOWNLOAD_PAGE_URL = "https://laychu.com";
 
 function App() {
