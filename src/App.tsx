@@ -77,7 +77,7 @@ function App() {
             Chinh phục mọi <span>Kỳ thi</span>
           </h1>
           <p className="hero-subtitle">
-            Ứng dụng <strong>Thi Thử</strong> là công cụ trắc nghiệm tối giản, mạnh mẽ chạy trực tiếp trên máy tính. Giúp bạn chủ động ôn tập đề thi, lưu trữ kết quả và tiến bộ vượt bậc từng ngày.
+            Ứng dụng <strong>Thi Thử</strong> là công cụ trắc nghiệm tối giản, mạnh mẽ chạy trực tiếp trên máy tính và điện thoại. Giúp bạn chủ động ôn tập đề thi, lưu trữ kết quả và tiến bộ vượt bậc từng ngày.
           </p>
           <div className="hero-buttons">
             <a href="#features" className="btn-primary">
