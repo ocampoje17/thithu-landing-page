@@ -12,8 +12,8 @@ const DOWNLOAD_PAGE_URL = "https://laychu.com";
 
 function App() {
   const [versionInfo, setVersionInfo] = useState<VersionInfo>({
-    version: "0.5.0",
-    pub_date: "2026-05-24T10:30:00+07:00",
+    version: "0.5.1",
+    pub_date: "2026-05-26T17:25:00+07:00",
     download_url: DOWNLOAD_PAGE_URL
   });
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
