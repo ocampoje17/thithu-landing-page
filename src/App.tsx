@@ -8,7 +8,7 @@ interface VersionInfo {
 }
 
 const VERSION_INFO_URL = "https://thithu.laychu.com/version.json";
-const DOWNLOAD_PAGE_URL = "https://laychu.com";
+const DOWNLOAD_PAGE_URL = "https://drive.google.com/drive/folders/19cGmYbVbUEyirDquXxKMCf7JEXLxP9WL?usp=sharing";
 
 function App() {
   const [versionInfo, setVersionInfo] = useState<VersionInfo>({
