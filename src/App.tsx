@@ -8,7 +8,7 @@ interface VersionInfo {
 }
 
 const VERSION_INFO_URL = "https://thithu.laychu.com/version.json";
-const DOWNLOAD_PAGE_URL = "https://drive.google.com/drive/folders/19cGmYbVbUEyirDquXxKMCf7JEXLxP9WL?usp=sharing";
+const DOWNLOAD_PAGE_URL = "https://laychu.com";
 
 function App() {
   const [versionInfo, setVersionInfo] = useState<VersionInfo>({
@@ -233,7 +233,7 @@ function App() {
                 </span>
               </div>
 
-              <a href={versionInfo.download_url} target="_blank" rel="noopener noreferrer" className="btn-primary">
+              <a href="https://drive.google.com/drive/folders/19cGmYbVbUEyirDquXxKMCf7JEXLxP9WL?usp=sharing" target="_blank" rel="noopener noreferrer" className="btn-primary">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="7 10 12 15 17 10" />
