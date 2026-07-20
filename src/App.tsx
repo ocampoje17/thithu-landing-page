@@ -1,4 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  getAnalyticsConsent,
+  initializeAnalytics,
+  saveAnalyticsConsent,
+  trackDownloadClick,
+  type AnalyticsConsent,
+} from './analytics';
 import './App.css';
 
 interface VersionInfo {
@@ -9,6 +16,7 @@ interface VersionInfo {
 
 const VERSION_INFO_URL = "https://thithu.laychu.com/version.json";
 const DOWNLOAD_PAGE_URL = "https://laychu.com";
+const DOWNLOAD_URL = "https://drive.google.com/drive/folders/19cGmYbVbUEyirDquXxKMCf7JEXLxP9WL?usp=sharing";
 
 function App() {
   const [versionInfo, setVersionInfo] = useState<VersionInfo>({
@@ -17,6 +25,9 @@ function App() {
     download_url: DOWNLOAD_PAGE_URL
   });
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
+  const [analyticsConsent, setAnalyticsConsent] = useState<AnalyticsConsent | null>(getAnalyticsConsent);
+  const analyticsConsentDialogRef = useRef<HTMLDivElement>(null);
+  const declineAnalyticsButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     fetch(VERSION_INFO_URL)
@@ -35,6 +46,50 @@ function App() {
         console.warn('Error loading version info, using fallback defaults:', err);
       });
   }, []);
+
+  useEffect(() => {
+    if (analyticsConsent === 'granted') {
+      initializeAnalytics();
+    }
+  }, [analyticsConsent]);
+
+  useEffect(() => {
+    if (analyticsConsent !== null) {
+      return;
+    }
+
+    declineAnalyticsButtonRef.current?.focus();
+
+    const keepFocusInDialog = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      const buttons = analyticsConsentDialogRef.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)');
+      if (!buttons || buttons.length === 0) {
+        return;
+      }
+
+      const firstButton = buttons[0];
+      const lastButton = buttons[buttons.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstButton) {
+        event.preventDefault();
+        lastButton.focus();
+      } else if (!event.shiftKey && document.activeElement === lastButton) {
+        event.preventDefault();
+        firstButton.focus();
+      }
+    };
+
+    document.addEventListener('keydown', keepFocusInDialog);
+    return () => document.removeEventListener('keydown', keepFocusInDialog);
+  }, [analyticsConsent]);
+
+  const handleAnalyticsConsent = (consent: AnalyticsConsent) => {
+    saveAnalyticsConsent(consent);
+    setAnalyticsConsent(consent);
+  };
 
   return (
     <div className="app-container">
@@ -233,7 +288,7 @@ function App() {
                 </span>
               </div>
 
-              <a href="https://drive.google.com/drive/folders/19cGmYbVbUEyirDquXxKMCf7JEXLxP9WL?usp=sharing" target="_blank" rel="noopener noreferrer" className="btn-primary">
+              <a href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" onClick={() => trackDownloadClick(DOWNLOAD_URL)}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="7 10 12 15 17 10" />
@@ -334,6 +389,10 @@ function App() {
 
                   <h4>4. Quyền truy cập thiết bị</h4>
                   <p>Ứng dụng chỉ yêu cầu các quyền truy cập tệp tin cơ bản để có thể đọc/ghi các bộ đề thi `.2td` do bạn chọn mở. Chúng tôi hoàn toàn không truy cập trái phép các thư mục riêng tư khác của bạn.</p>
+
+                  <h4>5. Google Analytics trên website</h4>
+                  <p>Website <strong>thithu.laychu.com</strong> chỉ tải Google Analytics khi bạn chọn đồng ý. Analytics giúp chúng tôi hiểu lượt xem trang và lượt nhấn tải ứng dụng để cải thiện website; lựa chọn từ chối không ảnh hưởng đến việc sử dụng trang.</p>
+                  <p>Lựa chọn của bạn được lưu cục bộ trong trình duyệt. Nếu muốn thay đổi lựa chọn sau này, bạn có thể xóa dữ liệu trang web của <strong>thithu.laychu.com</strong> trong cài đặt trình duyệt rồi tải lại trang.</p>
                 </>
               ) : (
                 <>
@@ -352,6 +411,41 @@ function App() {
                   <p>Chúng tôi giữ quyền cập nhật các điều khoản này khi phát hành các phiên bản mới của ứng dụng để đảm bảo phù hợp với luật pháp và trải nghiệm sử dụng an toàn.</p>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {analyticsConsent === null && (
+        <div className="modal-backdrop analytics-consent-backdrop">
+          <div
+            ref={analyticsConsentDialogRef}
+            className="modal-window analytics-consent-window"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="analytics-consent-title"
+            aria-describedby="analytics-consent-description"
+          >
+            <div className="analytics-consent-content">
+              <h2 id="analytics-consent-title">Cho phép Google Analytics?</h2>
+              <p id="analytics-consent-description">Chúng tôi muốn đo lượt xem trang và lượt tải ứng dụng để cải thiện Thi Thử. Nếu đồng ý, Google Analytics sẽ được tải và có thể sử dụng cookie. Bạn vẫn dùng trang bình thường nếu từ chối.</p>
+              <div className="analytics-consent-actions">
+                <button
+                  ref={declineAnalyticsButtonRef}
+                  type="button"
+                  className="analytics-consent-button analytics-consent-decline"
+                  onClick={() => handleAnalyticsConsent('denied')}
+                >
+                  Không, cảm ơn
+                </button>
+                <button
+                  type="button"
+                  className="analytics-consent-button analytics-consent-accept"
+                  onClick={() => handleAnalyticsConsent('granted')}
+                >
+                  Đồng ý
+                </button>
+              </div>
             </div>
           </div>
         </div>
