@@ -9,7 +9,7 @@ type Gtag = (...args: unknown[]) => void;
 
 declare global {
   interface Window {
-    dataLayer?: unknown[][];
+    dataLayer?: IArguments[];
     gtag?: Gtag;
   }
 }
@@ -35,9 +35,14 @@ export function saveAnalyticsConsent(consent: AnalyticsConsent): void {
 
 function getGtag(): Gtag {
   window.dataLayer ??= [];
-  window.gtag ??= (...args: unknown[]) => {
-    window.dataLayer?.push(args);
-  };
+
+  if (!window.gtag) {
+    window.gtag = function gtag() {
+      // Google tag processes command arguments queued in this exact format.
+      // eslint-disable-next-line prefer-rest-params
+      window.dataLayer?.push(arguments);
+    };
+  }
 
   return window.gtag;
 }
@@ -60,6 +65,7 @@ export function initializeAnalytics(): void {
   gtag('config', MEASUREMENT_ID, {
     allow_google_signals: false,
     allow_ad_personalization_signals: false,
+    send_page_view: true,
   });
 
   const script = document.createElement('script');
